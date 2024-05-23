@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "dev-new-arch",
+    "slug": "dev-new-arch",
+    "version": "1.0.0",
+    "scheme": "dev-new-arch",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/c424f3a1-513e-40ff-82cc-e4191ae4e687"
+    },
+    "orientation": "portrait",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "it.engds.dev-new-arch"
+    },
+    "android": {
+      "package": "com.example.withnewarch"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnabled": true
+          },
+          "android": {
+            "newArchEnabled": true
+          }
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "ALL"
+        }
+      ],
+      ["expo-font", {}]
+    ]
+  }
+}
