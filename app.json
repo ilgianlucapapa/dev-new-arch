@@ -26,6 +26,12 @@
         "projectId": "c424f3a1-513e-40ff-82cc-e4191ae4e687"
       }
     },
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets//splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#232526"
+    },
     "plugins": [
       [
         "expo-build-properties",

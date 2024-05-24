@@ -4,7 +4,14 @@ import { StyleSheet, View, ScrollView, ActivityIndicator, Text } from 'react-nat
 // import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { WebView } from 'react-native-webview';
-// import Constants from 'expo-constants';
+import * as SplashScreen from 'expo-splash-screen';
+import AnimatedAppLoader from './AnimatedAppLoader';
+import Constants from 'expo-constants';
+
+// Instruct SplashScreen not to hide yet, we want to do this manually
+SplashScreen.preventAutoHideAsync().catch(() => {
+  /* reloading the app might trigger some race conditions, ignore them */
+});
 
 export default function App() {
   const webViewRef = useRef(null);
@@ -54,67 +61,69 @@ export default function App() {
 
   return (
     <>
-      <LinearGradient
-        colors={['#232526', '#66686a']}
-        style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
-      />
-      <View
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          alignItems: 'center',
-          justifyContent: 'center',
-          alignContent: 'center'
-        }}
-      >
-        <LottieView
-          source={require('./assets/camera.json')}
-          style={{
-            width: '50%',
-            height: '30%'
-          }}
-          autoPlay
-          loop
+      <AnimatedAppLoader image={{ uri: Constants.expoConfig.splash.image }}>
+        <LinearGradient
+          colors={['#232526', '#66686a']}
+          style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
         />
-        <ScrollView style={styles.scrollView}>
-          {logMessages.map((msg, index) => (
-            <Text key={index}>{msg}</Text>
-          ))}
-        </ScrollView>
-      </View>
-      <WebView
-        ref={webViewRef}
-        onContentProcessDidTerminate={onContentProcessDidTerminate}
-        style={styles.wwContainer}
-        originWhitelist={['*']}
-        source={{ uri: 'https://www.moncler.com' }}
-        startInLoadingState
-        mediaCapturePermissionGrantType="grant"
-        userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-        javaScriptEnabled
-        domStorageEnabled
-        cacheEnabled
-        thirdPartyCookiesEnabled
-        allowsProtectedMedia
-        allowUniversalAccessFromFileURLs
-        allowsInlineMediaPlayback
-        mediaPlaybackRequiresUserAction={false}
-        injectedJavaScript={injectedJavaScript}
-        onMessage={handleMessage}
-        onLoadEnd={callWebAppFunction}
-        renderLoading={() => {
-          return (
-            <ActivityIndicator
-              color="white"
-              size="large"
-              style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0 }}
-            />
-          );
-        }}
-      />
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+            alignContent: 'center'
+          }}
+        >
+          <LottieView
+            source={require('./assets/camera.json')}
+            style={{
+              width: '50%',
+              height: '30%'
+            }}
+            autoPlay
+            loop
+          />
+          <ScrollView style={styles.scrollView}>
+            {logMessages.map((msg, index) => (
+              <Text key={index}>{msg}</Text>
+            ))}
+          </ScrollView>
+        </View>
+        <WebView
+          ref={webViewRef}
+          onContentProcessDidTerminate={onContentProcessDidTerminate}
+          style={styles.wwContainer}
+          originWhitelist={['*']}
+          source={{ uri: 'https://www.moncler.com' }}
+          startInLoadingState
+          mediaCapturePermissionGrantType="grant"
+          userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+          javaScriptEnabled
+          domStorageEnabled
+          cacheEnabled
+          thirdPartyCookiesEnabled
+          allowsProtectedMedia
+          allowUniversalAccessFromFileURLs
+          allowsInlineMediaPlayback
+          mediaPlaybackRequiresUserAction={false}
+          injectedJavaScript={injectedJavaScript}
+          onMessage={handleMessage}
+          onLoadEnd={callWebAppFunction}
+          renderLoading={() => {
+            return (
+              <ActivityIndicator
+                color="white"
+                size="large"
+                style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0 }}
+              />
+            );
+          }}
+        />
+      </AnimatedAppLoader>
     </>
   );
 }
