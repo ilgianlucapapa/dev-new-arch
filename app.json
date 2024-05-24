@@ -19,6 +19,13 @@
     "android": {
       "package": "com.example.withnewarch"
     },
+    "extra": {
+      "env": "development",
+      "buildNumber": "1.0.0",
+      "eas": {
+        "projectId": "c424f3a1-513e-40ff-82cc-e4191ae4e687"
+      }
+    },
     "plugins": [
       [
         "expo-build-properties",
