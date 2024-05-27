@@ -14,7 +14,13 @@
     "orientation": "portrait",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "it.engds.dev-new-arch"
+      "bundleIdentifier": "it.engds.dev-new-arch",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["dev-new-arch", "yourcegidmobilepos", "moncler-rfid-scanner"],
+        "NSFaceIDUsageDescription": "This app uses the biometrics authentication.",
+        "NSCameraUsageDescription": "Needs Camera Access",
+        "NSMicrophoneUsageDescription": "Needs Mic Access"
+      }
     },
     "android": {
       "package": "com.example.withnewarch"

@@ -7,6 +7,7 @@ import { WebView } from 'react-native-webview';
 import * as SplashScreen from 'expo-splash-screen';
 import AnimatedAppLoader from './AnimatedAppLoader';
 import Constants from 'expo-constants';
+import DraggableComponents from './DraggableComponents/DraggableComponents';
 
 // Instruct SplashScreen not to hide yet, we want to do this manually
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -44,7 +45,14 @@ export default function App() {
    */
   const callWebAppFunction = () => {
     if (webViewRef.current) {
-      const script = `if (window.myFunction) { window.myFunction(); }`;
+      console.log('**************************');
+      console.log('**************************');
+      console.log('**************************');
+      console.log('CHANGE VIDEO SOURCE');
+      console.log('**************************');
+      console.log('**************************');
+      console.log('**************************');
+      const script = `console.log("onChangeVideoSource: ", window.onChangeVideoSource); if (window.onChangeVideoSource) { window.onChangeVideoSource(); }`;
       webViewRef.current.injectJavaScript(script);
     }
   };
@@ -87,42 +95,47 @@ export default function App() {
             autoPlay
             loop
           />
-          <ScrollView style={styles.scrollView}>
-            {logMessages.map((msg, index) => (
-              <Text key={index}>{msg}</Text>
-            ))}
-          </ScrollView>
+          {logMessages && logMessages.length > 0 && (
+            <ScrollView style={styles.scrollView}>
+              {logMessages.map((msg, index) => (
+                <Text key={index}>{msg}</Text>
+              ))}
+            </ScrollView>
+          )}
         </View>
-        <WebView
-          ref={webViewRef}
-          onContentProcessDidTerminate={onContentProcessDidTerminate}
-          style={styles.wwContainer}
-          originWhitelist={['*']}
-          source={{ uri: 'https://www.moncler.com' }}
-          startInLoadingState
-          mediaCapturePermissionGrantType="grant"
-          userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-          javaScriptEnabled
-          domStorageEnabled
-          cacheEnabled
-          thirdPartyCookiesEnabled
-          allowsProtectedMedia
-          allowUniversalAccessFromFileURLs
-          allowsInlineMediaPlayback
-          mediaPlaybackRequiresUserAction={false}
-          injectedJavaScript={injectedJavaScript}
-          onMessage={handleMessage}
-          onLoadEnd={callWebAppFunction}
-          renderLoading={() => {
-            return (
-              <ActivityIndicator
-                color="white"
-                size="large"
-                style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0 }}
-              />
-            );
-          }}
-        />
+        <DraggableComponents onCamera={callWebAppFunction}>
+          <WebView
+            ref={webViewRef}
+            onContentProcessDidTerminate={onContentProcessDidTerminate}
+            style={styles.wwContainer}
+            originWhitelist={['*']}
+            // source={{ uri: 'https://s3.eu-west-1.amazonaws.com/chat.myclienteling.com/whitelabel/v_3/index.html' }}
+            source={{ uri: 'https://google.com' }}
+            startInLoadingState
+            mediaCapturePermissionGrantType="grant"
+            userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+            javaScriptEnabled
+            domStorageEnabled
+            cacheEnabled
+            thirdPartyCookiesEnabled
+            allowsProtectedMedia
+            allowUniversalAccessFromFileURLs
+            allowsInlineMediaPlayback
+            mediaPlaybackRequiresUserAction={false}
+            injectedJavaScript={injectedJavaScript}
+            onMessage={handleMessage}
+            // onLoadEnd={callWebAppFunction}
+            renderLoading={() => {
+              return (
+                <ActivityIndicator
+                  color="white"
+                  size="large"
+                  style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0 }}
+                />
+              );
+            }}
+          />
+        </DraggableComponents>
       </AnimatedAppLoader>
     </>
   );
@@ -137,16 +150,16 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
   wwContainer: {
-    position: 'absolute',
-    bottom: 50,
-    left: 0,
-    right: 0,
+    // position: 'absolute',
+    // bottom: 50,
+    // left: 0,
+    // right: 0,
     alignItems: 'center',
     backgroundColor: 'white',
     height: 250,
-    padding: 10,
-    margin: 10,
-    borderRadius: 10,
+    padding: 2,
+    margin: 2,
+    borderRadius: 5,
     overflow: 'hidden',
     zIndex: 10
   },
