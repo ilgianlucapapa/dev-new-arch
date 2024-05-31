@@ -1,142 +1,202 @@
-import React, { useRef, useState } from 'react';
-import LottieView from 'lottie-react-native';
-import { StyleSheet, View, ScrollView, ActivityIndicator, Text } from 'react-native';
-// import { Image } from 'expo-image';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { View, Animated, Easing, StyleSheet, Text, TouchableHighlight, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { WebView } from 'react-native-webview';
 import * as SplashScreen from 'expo-splash-screen';
-import AnimatedAppLoader from './AnimatedAppLoader';
-import Constants from 'expo-constants';
-import DraggableComponents from './DraggableComponents/DraggableComponents';
+import LottieView from 'lottie-react-native';
+import Voice, { SpeechRecognizedEvent, SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
 
-// Instruct SplashScreen not to hide yet, we want to do this manually
-SplashScreen.preventAutoHideAsync().catch(() => {
-  /* reloading the app might trigger some race conditions, ignore them */
-});
+const LOTTIE_JSON = require('./assets/hair1.json');
 
 export default function App() {
-  const webViewRef = useRef(null);
-  const [logMessages, setLogMessages] = React.useState([]);
+  const [isAppReady, setAppReady] = useState(false);
+  const [audioStart, setAudioStart] = useState(0);
+  const [recognized, setRecognized] = useState('');
+  const [volume, setVolume] = useState('');
+  const [error, setError] = useState('');
+  const [end, setEnd] = useState('');
+  const [started, setStarted] = useState('');
+  const [results, setResults] = useState([]);
+  const [partialResults, setPartialResults] = useState([]);
 
-  const onContentProcessDidTerminate = () => webViewRef.current?.reload();
-  //   {/* https://s3.eu-west-1.amazonaws.com/chat.myclienteling.com/whitelabel/v_3/index.html */}
-  /**
-   * @function handleMessage
-   * @param {String} message
-   * @description this is the message from React PWA. Handle it here
-   */
-  const handleMessage = (message = null) => {
-    console.log('************************************');
-    console.log('************************************');
-    console.log('MESSAGE RECEIVED');
-    console.log('************************************');
-    const messageReceived = message?.nativeEvent?.data;
-    console.log(JSON.stringify(messageReceived));
-    setLogMessages(prevMessages => [...prevMessages, messageReceived]);
-    console.log('************************************');
-    console.log('************************************');
-    console.log('************************************');
+  useEffect(() => {
+    Voice.onSpeechStart = onSpeechStart;
+    Voice.onSpeechRecognized = onSpeechRecognized;
+    Voice.onSpeechEnd = onSpeechEnd;
+    Voice.onSpeechError = onSpeechError;
+    Voice.onSpeechResults = onSpeechResults;
+    Voice.onSpeechPartialResults = onSpeechPartialResults;
+    Voice.onSpeechVolumeChanged = onSpeechVolumeChanged;
+    setAppReady(false);
+    setTimeout(() => {
+      onLayout();
+    }, 500);
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const onLayout = useCallback(async () => {
+    setAppReady(true);
+  }, []);
+
+  const onSpeechStart = e => {
+    console.log('onSpeechStart: ', e);
+    setStarted('√');
   };
 
-  /**
-   * @function callWebAppFunction
-   * @description send any msg from React native app to PWA web
-   * @description this method will also be fired when the web view loaded succesfully - did mount 1st time - onLoad prop in <Webview>
-   */
-  const callWebAppFunction = () => {
-    if (webViewRef.current) {
-      console.log('**************************');
-      console.log('**************************');
-      console.log('**************************');
-      console.log('CHANGE VIDEO SOURCE');
-      console.log('**************************');
-      console.log('**************************');
-      console.log('**************************');
-      const script = `console.log("onChangeVideoSource: ", window.onChangeVideoSource); if (window.onChangeVideoSource) { window.onChangeVideoSource(); }`;
-      webViewRef.current.injectJavaScript(script);
+  const onSpeechRecognized = e => {
+    console.log('onSpeechRecognized: ', e);
+    setRecognized('√');
+  };
+
+  const onSpeechEnd = e => {
+    console.log('onSpeechEnd: ', e);
+    setEnd('√');
+  };
+
+  const onSpeechError = e => {
+    console.log('onSpeechError: ', e);
+    setError(JSON.stringify(e.error));
+  };
+
+  const onSpeechResults = e => {
+    console.log('onSpeechResults: ', e);
+    setResults(e.value);
+  };
+
+  const onSpeechPartialResults = e => {
+    console.log('onSpeechPartialResults: ', e);
+    setPartialResults(e.value);
+  };
+
+  const onSpeechVolumeChanged = e => {
+    console.log('onSpeechVolumeChanged: ', e);
+    setVolume(e.value);
+  };
+
+  const _startRecognizing = async () => {
+    _clearState();
+    try {
+      await Voice.start('it-IT');
+      console.log('called start');
+      setAudioStart(1);
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const injectedJavaScript = `
-    (function() {
-      const originalLog = console.log;
-      console.log = function(...args) {
-        window.ReactNativeWebView.postMessage(JSON.stringify(args));
-        originalLog.apply(console, args);
-      };
-    })();
-  `;
+  const _stopRecognizing = async () => {
+    try {
+      await Voice.stop();
+      setAudioStart(0);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const _cancelRecognizing = async () => {
+    try {
+      await Voice.cancel();
+      setAudioStart(0);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const _destroyRecognizer = async () => {
+    try {
+      await Voice.destroy();
+      setAudioStart(0);
+    } catch (e) {
+      console.error(e);
+    }
+    _clearState();
+  };
+
+  const _clearState = () => {
+    setRecognized('');
+    setVolume('');
+    setError('');
+    setEnd('');
+    setStarted('');
+    setResults([]);
+    setPartialResults([]);
+  };
+
+  const showAnimation = !isAppReady;
 
   return (
     <>
-      <AnimatedAppLoader image={{ uri: Constants.expoConfig.splash.image }}>
-        <LinearGradient
-          colors={['#232526', '#66686a']}
-          style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
-        />
-        <View
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            alignItems: 'center',
-            justifyContent: 'center',
-            alignContent: 'center'
-          }}
-        >
+      {showAnimation && (
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.splashContainer]}>
           <LottieView
-            source={require('./assets/camera.json')}
             style={{
               width: '50%',
               height: '30%'
             }}
+            source={LOTTIE_JSON}
             autoPlay
             loop
           />
-          {logMessages && logMessages.length > 0 && (
-            <ScrollView style={styles.scrollView}>
-              {logMessages.map((msg, index) => (
-                <Text key={index}>{msg}</Text>
-              ))}
-            </ScrollView>
-          )}
         </View>
-        <DraggableComponents onCamera={callWebAppFunction}>
-          <WebView
-            ref={webViewRef}
-            onContentProcessDidTerminate={onContentProcessDidTerminate}
-            style={styles.wwContainer}
-            originWhitelist={['*']}
-            // source={{ uri: 'https://s3.eu-west-1.amazonaws.com/chat.myclienteling.com/whitelabel/v_3/index.html' }}
-            source={{ uri: 'https://google.com' }}
-            startInLoadingState
-            mediaCapturePermissionGrantType="grant"
-            userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-            javaScriptEnabled
-            domStorageEnabled
-            cacheEnabled
-            thirdPartyCookiesEnabled
-            allowsProtectedMedia
-            allowUniversalAccessFromFileURLs
-            allowsInlineMediaPlayback
-            mediaPlaybackRequiresUserAction={false}
-            injectedJavaScript={injectedJavaScript}
-            onMessage={handleMessage}
-            // onLoadEnd={callWebAppFunction}
-            renderLoading={() => {
-              return (
-                <ActivityIndicator
-                  color="white"
-                  size="large"
-                  style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0 }}
-                />
-              );
-            }}
+      )}
+      {!showAnimation && (
+        <>
+          <LinearGradient
+            colors={['#232526', '#66686a']}
+            style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
           />
-        </DraggableComponents>
-      </AnimatedAppLoader>
+          <TouchableHighlight
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+              alignContent: 'center',
+              zIndex: 10
+            }}
+            onPress={audioStart === 0 ? _startRecognizing : _stopRecognizing}
+          >
+            <LottieView
+              source={audioStart === 0 ? require('./assets/audio1.json') : require('./assets/audio2.json')}
+              style={{
+                width: '50%',
+                height: '30%'
+              }}
+              autoPlay
+              loop
+            />
+          </TouchableHighlight>
+
+          <ScrollView style={[StyleSheet.absoluteFill, styles.textContainer]}>
+            {/* <Text style={styles.stat}>{`Started: ${started}`}</Text>
+            <Text style={styles.stat}>{`Recognized: ${recognized}`}</Text>
+            <Text style={styles.stat}>{`Volume: ${volume}`}</Text>
+            <Text style={styles.stat}>{`Error: ${error}`}</Text> */}
+            {/* <Text style={styles.stat}>Results</Text> */}
+            {results.map((result, index) => {
+              return (
+                <Text key={`result-${index}`} style={styles.stat}>
+                  {result}
+                </Text>
+              );
+            })}
+            {/* <Text style={styles.stat}>Partial Results</Text>
+            {partialResults.map((result, index) => {
+              return (
+                <Text key={`partial-result-${index}`} style={styles.stat}>
+                  {result}
+                </Text>
+              );
+            })}
+            <Text style={styles.stat}>{`End: ${end}`}</Text> */}
+          </ScrollView>
+        </>
+      )}
     </>
   );
 }
@@ -149,24 +209,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden'
   },
-  wwContainer: {
-    // position: 'absolute',
-    // bottom: 50,
-    // left: 0,
-    // right: 0,
+  splashContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
-    height: 250,
-    padding: 2,
-    margin: 2,
-    borderRadius: 5,
-    overflow: 'hidden',
-    zIndex: 10
+    backgroundColor: '#232526'
   },
-  scrollView: {
-    backgroundColor: 'floralwhite',
-    marginHorizontal: 10,
-    padding: 10,
-    borderRadius: 10
+  textContainer: {
+    flex: 1,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 50,
+    bottom: 0,
+    zIndex: 9
+    // backgroundColor: 'white'
+  },
+  button: {
+    width: 50,
+    height: 50
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10
+  },
+  action: {
+    textAlign: 'center',
+    color: '#0000FF',
+    marginVertical: 5,
+    fontWeight: 'bold'
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5
+  },
+  stat: {
+    textAlign: 'left',
+    color: '#94a3b8',
+    fontSize: 80,
+    lineHeight: 80,
+    margin: 30,
+    padding: 5
   }
 });
