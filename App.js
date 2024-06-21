@@ -94,6 +94,7 @@ export default function App() {
     try {
       await Voice.stop();
       setAudioStart(0);
+      setModalVisible(!isModalVisible);
     } catch (e) {
       console.error(e);
     }
@@ -126,6 +127,27 @@ export default function App() {
     setStarted('');
     setResults([]);
     setPartialResults([]);
+  };
+
+  const toggleModal = () => {
+    Animated.timing(animation, {
+      toValue: isModalVisible ? 0 : 1,
+      duration: 500,
+      useNativeDriver: true
+    }).start();
+
+    setModalVisible(!isModalVisible);
+  };
+
+  const slideUp = {
+    transform: [
+      {
+        translateY: animation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [500, 0]
+        })
+      }
+    ]
   };
 
   const showAnimation = !isAppReady;
@@ -247,6 +269,12 @@ export default function App() {
           </ScrollView>
         </>
       )}
+      <Modal isVisible={isModalVisible} style={{ margin: 0, justifyContent: 'flex-end', backgroundColor: 'red' }}>
+        <Animated.View style={[{ backgroundColor: 'white', padding: 22 }, slideUp]}>
+          <Text>{results}</Text>
+          {/* <Button title="Hide modal" onPress={toggleModal} /> */}
+        </Animated.View>
+      </Modal>
     </>
   );
 }
