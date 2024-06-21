@@ -4,6 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as SplashScreen from 'expo-splash-screen';
 import LottieView from 'lottie-react-native';
 import Voice, { SpeechRecognizedEvent, SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
+import { Feather } from '@expo/vector-icons';
+import Modal from 'react-native-modal';
 
 const LOTTIE_JSON = require('./assets/hair1.json');
 
@@ -17,6 +19,8 @@ export default function App() {
   const [started, setStarted] = useState('');
   const [results, setResults] = useState([]);
   const [partialResults, setPartialResults] = useState([]);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [animation] = useState(new Animated.Value(0));
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStart;
@@ -147,30 +151,76 @@ export default function App() {
             colors={['#232526', '#66686a']}
             style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
           />
-          <TouchableHighlight
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-              alignContent: 'center',
-              zIndex: 10
-            }}
-            onPress={audioStart === 0 ? _startRecognizing : _stopRecognizing}
-          >
-            <LottieView
-              source={audioStart === 0 ? require('./assets/audio1.json') : require('./assets/audio2.json')}
+          {audioStart === 0 && (
+            <TouchableHighlight
               style={{
-                width: '50%',
-                height: '30%'
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                alignItems: 'center',
+                justifyContent: 'center',
+                alignContent: 'center',
+                zIndex: 10
               }}
-              autoPlay
-              loop
-            />
-          </TouchableHighlight>
+              onPress={_startRecognizing}
+            >
+              <View
+                style={{
+                  width: 150,
+                  height: 150,
+                  borderRadius: 75,
+                  backgroundColor: '#66686a',
+                  alignContent: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  display: 'flex'
+                }}
+              >
+                <View
+                  style={{
+                    width: 120,
+                    height: 120,
+                    borderRadius: 60,
+                    backgroundColor: '#232526',
+                    alignContent: 'center',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    display: 'flex'
+                  }}
+                >
+                  <Feather name="mic" size={50} color="white" />
+                </View>
+              </View>
+            </TouchableHighlight>
+          )}
+          {audioStart !== 0 && (
+            <TouchableHighlight
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                alignItems: 'center',
+                justifyContent: 'center',
+                alignContent: 'center',
+                zIndex: 10
+              }}
+              onPress={_stopRecognizing}
+            >
+              <LottieView
+                source={require('./assets/audio2.json')}
+                style={{
+                  width: '50%',
+                  height: '30%'
+                }}
+                autoPlay
+                loop
+              />
+            </TouchableHighlight>
+          )}
 
           <ScrollView style={[StyleSheet.absoluteFill, styles.textContainer]}>
             {/* <Text style={styles.stat}>{`Started: ${started}`}</Text>
