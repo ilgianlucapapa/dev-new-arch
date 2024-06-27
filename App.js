@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import ImageColors from 'react-native-image-colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const App = () => {
   const [dominantsColor, setDominantsColor] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // CROP GLOBAL: ?cropx=1&cropy=1&cropw=5&croph=1
+  // CROP CHINA : ?x-oss-process=image/crop,x_1,y_1,w_1,h_1
 
   const data = [
     {
@@ -31,16 +35,16 @@ const App = () => {
     {
       id: 4,
       imageUrl:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/H20961A00005M2695999_F/dpx6uv/std/360x540/H20961A00005M2695999_F.jpg',
+        'https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2022%2F09%2Fmoncler-maya-70-limited-edition-down-jacket-hbx-release-info-005.jpg?cbr=1&q=90',
       imageUrlCropped:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/H20961A00005M2695999_F/dpx6uv/std/360x540/H20961A00005M2695999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1'
+        'https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2022%2F09%2Fmoncler-maya-70-limited-edition-down-jacket-hbx-release-info-005.jpg?cbr=1&q=90?cropx=1&cropy=1&cropw=5&croph=1'
     },
     {
       id: 5,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg',
       imageUrlCropped:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1'
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg'
     },
     {
       id: 6,
@@ -112,6 +116,12 @@ const App = () => {
           numColumns={2}
           renderItem={({ item, index }) => (
             <View key={item.id} style={[styles.viewImage, { backgroundColor: item.colors.background }]}>
+              {/* <LinearGradient
+                // // Background Linear Gradient
+                colors={[item.colors.background, 'transparent']}
+                style={styles.background}
+              /> */}
+              <LinearGradient colors={[item.colors.background, 'transparent']} style={styles.gradient} />
               <Image style={styles.image} source={{ uri: item.imageUrl }} />
             </View>
           )}
@@ -149,6 +159,14 @@ const styles = StyleSheet.create({
     padding: 15,
     borderColor: 'green',
     borderWidth: 1
+  },
+  gradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 15 // adjust to your needs
   }
 });
 
