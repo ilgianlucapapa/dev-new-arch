@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import ImageColors from 'react-native-image-colors';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from '@react-native-community/blur';
 
 const App = () => {
   const [dominantsColor, setDominantsColor] = useState([]);
@@ -10,6 +11,7 @@ const App = () => {
   // CROP GLOBAL: ?cropx=1&cropy=1&cropw=5&croph=1
   // CROP CHINA : ?x-oss-process=image/crop,x_1,y_1,w_1,h_1
 
+  const blurAmount = 10;
   const data = [
     {
       id: 1,
@@ -35,22 +37,23 @@ const App = () => {
     {
       id: 4,
       imageUrl:
-        'https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2022%2F09%2Fmoncler-maya-70-limited-edition-down-jacket-hbx-release-info-005.jpg?cbr=1&q=90',
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg',
       imageUrlCropped:
-        'https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2022%2F09%2Fmoncler-maya-70-limited-edition-down-jacket-hbx-release-info-005.jpg?cbr=1&q=90?cropx=1&cropy=1&cropw=5&croph=1'
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1'
     },
     {
       id: 5,
       imageUrl:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg',
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209B4H00070M2707999_F/dpx6uv/std/0x0/I209B4H00070M2707999_F.jpg',
       imageUrlCropped:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg'
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209B4H00070M2707999_F/dpx6uv/std/0x0/I209B4H00070M2707999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1'
     },
     {
       id: 6,
-      imageUrl: 'https://res.moncler.cn/prod/image/orgimg/moncler/I20911A51X0068950742_X.jpg',
+      imageUrl:
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/J20911A000065963V438_F/dpx6uv/std/0x0/J20911A000065963V438_F.jpg',
       imageUrlCropped:
-        'https://res.moncler.cn/prod/image/orgimg/moncler/I20911A51X0068950742_X.jpg?x-oss-process=image/crop,x_1,y_1,w_1,h_1'
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/J20911A000065963V438_F/dpx6uv/std/0x0/J20911A000065963V438_F.jpg?cropx=1&cropy=1&cropw=5&croph=1'
     }
   ];
 
@@ -116,13 +119,14 @@ const App = () => {
           numColumns={2}
           renderItem={({ item, index }) => (
             <View key={item.id} style={[styles.viewImage, { backgroundColor: item.colors.background }]}>
-              {/* <LinearGradient
-                // // Background Linear Gradient
-                colors={[item.colors.background, 'transparent']}
-                style={styles.background}
+              {/* <BlurView
+                style={styles.absolute}
+                blurType="light"
+                reducedTransparencyFallbackColor={item.colors.background}
+                blurAmount={blurAmount}
               /> */}
-              <LinearGradient colors={[item.colors.background, 'transparent']} style={styles.gradient} />
               <Image style={styles.image} source={{ uri: item.imageUrl }} />
+              {/* <LinearGradient colors={[item.colors.background, 'transparent']} style={styles.gradient} /> */}
             </View>
           )}
         />
@@ -165,8 +169,15 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+    bottom: 0
+    // borderRadius: 15 // adjust to your needs
+  },
+  absolute: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     bottom: 0,
-    borderRadius: 15 // adjust to your needs
+    right: 0
   }
 });
 
