@@ -2,9 +2,11 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList, PixelRatio, Button } from 'react-native';
 import ImageColors from 'react-native-image-colors';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { Video } from 'expo-av';
+import { Video, ResizeMode } from 'expo-av';
+import PdfPreview from './components/PdfPreview';
 
-const videoSource = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+const videoSource = 'https://s3.eu-central-1.amazonaws.com/temp.marketingcloud.moncler.com/Moncler.mp4';
+const pdfUrl = 'http://www.pdf995.com/samples/pdf.pdf';
 
 const App = () => {
   const ref = useRef(null);
@@ -18,6 +20,7 @@ const App = () => {
 
   const player = useVideoPlayer(videoSource, player => {
     player.loop = true;
+    player.muted = true;
     player.play();
   });
 
@@ -28,13 +31,15 @@ const App = () => {
       id: 0,
       imageUrl: '',
       imageUrlCropped: '',
-      isVideo: true
+      isVideo: true,
+      isPdf: false
     },
     {
       id: 99,
       imageUrl: '',
       imageUrlCropped: '',
-      isVideo: true
+      isVideo: true,
+      isPdf: true
     },
     {
       id: 1,
@@ -42,7 +47,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I20911A5360068950742_F/dpx6uv/std/360x540/I20911A5360068950742_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I20911A5360068950742_F/dpx6uv/std/360x540/I20911A5360068950742_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 2,
@@ -50,7 +56,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H20961A00009M2838999_F/dpx6uv/std/360x540/H20961A00009M2838999_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H20961A00009M2838999_F/dpx6uv/std/360x540/H20961A00009M2838999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 3,
@@ -58,7 +65,8 @@ const App = () => {
         'https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2022%2F09%2Fmoncler-maya-70-limited-edition-down-jacket-hbx-release-info-001.jpg?cbr=1&q=90',
       imageUrlCropped:
         'https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2022%2F09%2Fmoncler-maya-70-limited-edition-down-jacket-hbx-release-info-001.jpg?cbr=1&q=90',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 4,
@@ -66,7 +74,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 5,
@@ -74,7 +83,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209B4H00070M2707999_F/dpx6uv/std/0x0/I209B4H00070M2707999_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209B4H00070M2707999_F/dpx6uv/std/0x0/I209B4H00070M2707999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 6,
@@ -82,7 +92,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/J20911A000065963V438_F/dpx6uv/std/0x0/J20911A000065963V438_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/J20911A000065963V438_F/dpx6uv/std/0x0/J20911A000065963V438_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 7,
@@ -90,7 +101,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4M0027001A9A999_F/dpx6uv/std/1024x1024/H209A4M0027001A9A999_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4M0027001A9A999_F/dpx6uv/std/1024x1024/H209A4M0027001A9A999_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 8,
@@ -98,7 +110,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4C0001001A49998_F/dpx6uv/std/0x0/H209A4C0001001A49998_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4C0001001A49998_F/dpx6uv/std/0x0/H209A4C0001001A49998_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 9,
@@ -106,7 +119,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4M0027001A9A002_F/dpx6uv/std/1024x1024/H209A4M0027001A9A002_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4M0027001A9A002_F/dpx6uv/std/1024x1024/H209A4M0027001A9A002_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 10,
@@ -114,7 +128,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 11,
@@ -122,7 +137,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 12,
@@ -130,7 +146,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10918G72400V8119999_F/dpx6uv/std/1024x1024/F10918G72400V8119999_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10918G72400V8119999_F/dpx6uv/std/1024x1024/F10918G72400V8119999_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 13,
@@ -138,7 +155,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F20938G51500V8144999_F/dpx6uv/std/1024x1024/F20938G51500V8144999_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F20938G51500V8144999_F/dpx6uv/std/1024x1024/F20938G51500V8144999_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 14,
@@ -146,7 +164,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F20938I71500V8144999_F/dpx6uv/std/1024x1024/F20938I71500V8144999_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F20938I71500V8144999_F/dpx6uv/std/1024x1024/F20938I71500V8144999_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 15,
@@ -154,7 +173,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10938G70510V8036032_F/dpx6uv/std/1024x1024/F10938G70510V8036032_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10938G70510V8036032_F/dpx6uv/std/1024x1024/F10938G70510V8036032_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 16,
@@ -162,7 +182,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10938I70600C8031778_F/dpx6uv/std/1024x1024/F10938I70600C8031778_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10938I70600C8031778_F/dpx6uv/std/1024x1024/F10938I70600C8031778_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 17,
@@ -170,7 +191,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10918G71900V8119001_F/dpx6uv/std/1024x1024/F10918G71900V8119001_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10918G71900V8119001_F/dpx6uv/std/1024x1024/F10918G71900V8119001_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 18,
@@ -178,7 +200,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I10913B00035V0090999_F/dpx6uv/std/360x540/I10913B00035V0090999_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I10913B00035V0090999_F/dpx6uv/std/360x540/I10913B00035V0090999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 19,
@@ -186,7 +209,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I10933B00040V0006999_F/dpx6uv/std/360x540/I10933B00040V0006999_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I10933B00040V0006999_F/dpx6uv/std/360x540/I10933B00040V0006999_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 20,
@@ -194,7 +218,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I20933B00036A9327030_F/dpx6uv/std/360x540/I20933B00036A9327030_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I20933B00036A9327030_F/dpx6uv/std/360x540/I20933B00036A9327030_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 21,
@@ -202,7 +227,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H10933B00023V0006529_F/dpx6uv/std/360x540/H10933B00023V0006529_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H10933B00023V0006529_F/dpx6uv/std/360x540/H10933B00023V0006529_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 22,
@@ -210,7 +236,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H20939Z70301A9328985_F/dpx6uv/std/360x540/H20939Z70301A9328985_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H20939Z70301A9328985_F/dpx6uv/std/360x540/H20939Z70301A9328985_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 23,
@@ -218,7 +245,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/G20933B70201A9327714_F/dpx6uv/std/360x540/G20933B70201A9327714_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/G20933B70201A9327714_F/dpx6uv/std/360x540/G20933B70201A9327714_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 24,
@@ -226,7 +254,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U21811A_F/dpx6uv/std/360x540/I209S3G000020U21811A_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U21811A_F/dpx6uv/std/360x540/I209S3G000020U21811A_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 25,
@@ -234,7 +263,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H29512A0000268352742_F/dpx6uv/std/360x540/H29512A0000268352742_F.jpg',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H29512A0000268352742_F/dpx6uv/std/360x540/H29512A0000268352742_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 26,
@@ -242,7 +272,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218999_F/dpx6uv/std/360x540/I209S3G000020U218999_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218999_F/dpx6uv/std/360x540/I209S3G000020U218999_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 27,
@@ -250,7 +281,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218749_F/dpx6uv/std/360x540/I209S3G000020U218749_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218749_F/dpx6uv/std/360x540/I209S3G000020U218749_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 28,
@@ -258,7 +290,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218001_F/dpx6uv/std/360x540/I209S3G000020U218001_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218001_F/dpx6uv/std/360x540/I209S3G000020U218001_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 29,
@@ -266,7 +299,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U21832G_F/dpx6uv/std/360x540/I209S3G000020U21832G_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U21832G_F/dpx6uv/std/360x540/I209S3G000020U21832G_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     },
     {
       id: 30,
@@ -274,7 +308,8 @@ const App = () => {
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3B00003596J0999_F/dpx6uv/std/360x540/I209S3B00003596J0999_F',
       imageUrlCropped:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3B00003596J0999_F/dpx6uv/std/360x540/I209S3B00003596J0999_F?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false
+      isVideo: false,
+      isPdf: false
     }
   ];
 
@@ -374,7 +409,7 @@ const App = () => {
                 position: 'absolute',
                 width: '100%',
                 height: 50,
-                top: 30,
+                bottom: 30,
                 backgroundColor: '#ffffff',
                 color: '#000000',
                 zIndex: 999,
@@ -395,15 +430,27 @@ const App = () => {
             renderItem={({ item, index }) =>
               item.isVideo ? (
                 <View key={item.id} style={[styles.viewImage]}>
-                  <VideoView
+                  {/* <VideoView
                     ref={ref}
                     style={styles.video}
                     player={player}
                     allowsFullscreen
                     allowsPictureInPicture
                     contentFit="contain"
+                  /> */}
+                  <Video
+                    ref={videoRef}
+                    style={styles.video}
+                    source={{ uri: videoSource }}
+                    useNativeControls
+                    resizeMode={ResizeMode.CONTAIN}
+                    isLooping
+                    shouldPlay
+                    isMuted
                   />
                 </View>
+              ) : isPdf ? (
+                <PdfPreview pdfUrl={pdfUrl} />
               ) : (
                 <View key={item.id} style={[styles.viewImage, { backgroundColor: item.colors.background }]}>
                   <Image style={styles.image} source={{ uri: item.imageUrl }} />
@@ -446,7 +493,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'blue',
     borderColor: 'red',
-    borderWidth: 1
+    borderWidth: 1,
+    position: 'relative'
   },
   image: {
     width: 150,
@@ -466,10 +514,7 @@ const styles = StyleSheet.create({
   video: {
     width: '100%',
     height: '100%',
-    borderRadius: 0,
-    padding: 15,
-    borderColor: 'green',
-    borderWidth: 1
+    borderRadius: 0
   }
 });
 
