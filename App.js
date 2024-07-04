@@ -2,11 +2,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList, PixelRatio, Button } from 'react-native';
 import ImageColors from 'react-native-image-colors';
 import { useVideoPlayer, VideoView } from 'expo-video';
+import { Video } from 'expo-av';
 
 const videoSource = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
 const App = () => {
   const ref = useRef(null);
+  const videoRef = useRef(null);
   const [dominantsColor, setDominantsColor] = useState([]);
   const [loading, setLoading] = useState(true);
   const [start, setStart] = useState(null);
@@ -24,6 +26,12 @@ const App = () => {
   const data = [
     {
       id: 0,
+      imageUrl: '',
+      imageUrlCropped: '',
+      isVideo: true
+    },
+    {
+      id: 99,
       imageUrl: '',
       imageUrlCropped: '',
       isVideo: true
@@ -457,7 +465,7 @@ const styles = StyleSheet.create({
   },
   video: {
     width: '100%',
-    height: 250,
+    height: '100%',
     borderRadius: 0,
     padding: 15,
     borderColor: 'green',
