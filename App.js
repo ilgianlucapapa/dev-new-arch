@@ -1,45 +1,29 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList, PixelRatio, Button } from 'react-native';
 import ImageColors from 'react-native-image-colors';
-import { useVideoPlayer, VideoView } from 'expo-video';
-import { Video, ResizeMode } from 'expo-av';
 import PdfPreview from './components/PdfPreview';
+import VideoItem from './components/VideoItem';
 
-const videoSource = 'https://s3.eu-central-1.amazonaws.com/temp.marketingcloud.moncler.com/Moncler.mp4';
-const pdfUrl = 'http://www.pdf995.com/samples/pdf.pdf';
+// const videoSource = 'https://s3.eu-central-1.amazonaws.com/temp.marketingcloud.moncler.com/Moncler.mp4';
+// const pdfUrl = 'https://s3.eu-central-1.amazonaws.com/temp.marketingcloud.moncler.com/pdf.pdf';
 
 const App = () => {
-  const ref = useRef(null);
-  const videoRef = useRef(null);
+  const videoRefs = useRef([]);
+  const pdfRefs = useRef([]);
   const [dominantsColor, setDominantsColor] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [done, setDone] = useState(false);
   const [start, setStart] = useState(null);
   const [end, setEnd] = useState(null);
   const [duration, setDuration] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
 
-  const player = useVideoPlayer(videoSource, player => {
-    player.loop = true;
-    player.muted = true;
-    player.play();
-  });
-
-  // CROP GLOBAL: ?cropx=1&cropy=1&cropw=5&croph=1
-  // CROP CHINA : ?x-oss-process=image/crop,x_1,y_1,w_1,h_1
   const data = [
     {
       id: 0,
-      imageUrl: '',
+      imageUrl: 'https://s3.eu-central-1.amazonaws.com/temp.marketingcloud.moncler.com/Moncler.mp4',
       imageUrlCropped: '',
       isVideo: true,
       isPdf: false
-    },
-    {
-      id: 99,
-      imageUrl: '',
-      imageUrlCropped: '',
-      isVideo: true,
-      isPdf: true
     },
     {
       id: 1,
@@ -52,6 +36,20 @@ const App = () => {
     },
     {
       id: 2,
+      imageUrl: 'https://s3.eu-central-1.amazonaws.com/temp.marketingcloud.moncler.com/Moncler.mp4',
+      imageUrlCropped: '',
+      isVideo: true,
+      isPdf: false
+    },
+    {
+      id: 3,
+      imageUrl: 'https://s3.eu-central-1.amazonaws.com/temp.marketingcloud.moncler.com/pdf.pdf',
+      imageUrlCropped: '',
+      isVideo: false,
+      isPdf: true
+    },
+    {
+      id: 4,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H20961A00009M2838999_F/dpx6uv/std/360x540/H20961A00009M2838999_F.jpg',
       imageUrlCropped:
@@ -60,7 +58,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 3,
+      id: 5,
       imageUrl:
         'https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2022%2F09%2Fmoncler-maya-70-limited-edition-down-jacket-hbx-release-info-001.jpg?cbr=1&q=90',
       imageUrlCropped:
@@ -69,7 +67,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 4,
+      id: 6,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/J10931A00085539ZD999_F/dpx6uv/std/0x0/J10931A00085539ZD999_F.jpg',
       imageUrlCropped:
@@ -78,7 +76,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 5,
+      id: 7,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209B4H00070M2707999_F/dpx6uv/std/0x0/I209B4H00070M2707999_F.jpg',
       imageUrlCropped:
@@ -87,7 +85,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 6,
+      id: 8,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/J20911A000065963V438_F/dpx6uv/std/0x0/J20911A000065963V438_F.jpg',
       imageUrlCropped:
@@ -96,7 +94,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 7,
+      id: 9,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4M0027001A9A999_F/dpx6uv/std/1024x1024/H209A4M0027001A9A999_F',
       imageUrlCropped:
@@ -105,7 +103,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 8,
+      id: 10,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4C0001001A49998_F/dpx6uv/std/0x0/H209A4C0001001A49998_F.jpg',
       imageUrlCropped:
@@ -114,7 +112,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 9,
+      id: 11,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H209A4M0027001A9A002_F/dpx6uv/std/1024x1024/H209A4M0027001A9A002_F',
       imageUrlCropped:
@@ -123,25 +121,25 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 10,
-      imageUrl:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg',
-      imageUrlCropped:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false,
-      isPdf: false
-    },
-    {
-      id: 11,
-      imageUrl:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg',
-      imageUrlCropped:
-        'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
-      isVideo: false,
-      isPdf: false
-    },
-    {
       id: 12,
+      imageUrl:
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg',
+      imageUrlCropped:
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
+      isVideo: false,
+      isPdf: false
+    },
+    {
+      id: 13,
+      imageUrl:
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg',
+      imageUrlCropped:
+        'https://moncler-cdn.thron.com/delivery/public/image/moncler/F209U8C708108392B719_F/dpx6uv/std/360x540/F209U8C708108392B719_F.jpg?cropx=1&cropy=1&cropw=5&croph=1',
+      isVideo: false,
+      isPdf: false
+    },
+    {
+      id: 14,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10918G72400V8119999_F/dpx6uv/std/1024x1024/F10918G72400V8119999_F',
       imageUrlCropped:
@@ -150,7 +148,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 13,
+      id: 15,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F20938G51500V8144999_F/dpx6uv/std/1024x1024/F20938G51500V8144999_F',
       imageUrlCropped:
@@ -159,7 +157,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 14,
+      id: 16,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F20938I71500V8144999_F/dpx6uv/std/1024x1024/F20938I71500V8144999_F',
       imageUrlCropped:
@@ -168,7 +166,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 15,
+      id: 17,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10938G70510V8036032_F/dpx6uv/std/1024x1024/F10938G70510V8036032_F',
       imageUrlCropped:
@@ -177,7 +175,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 16,
+      id: 18,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10938I70600C8031778_F/dpx6uv/std/1024x1024/F10938I70600C8031778_F',
       imageUrlCropped:
@@ -186,7 +184,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 17,
+      id: 19,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/F10918G71900V8119001_F/dpx6uv/std/1024x1024/F10918G71900V8119001_F',
       imageUrlCropped:
@@ -195,7 +193,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 18,
+      id: 20,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I10913B00035V0090999_F/dpx6uv/std/360x540/I10913B00035V0090999_F.jpg',
       imageUrlCropped:
@@ -204,7 +202,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 19,
+      id: 21,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I10933B00040V0006999_F/dpx6uv/std/360x540/I10933B00040V0006999_F.jpg',
       imageUrlCropped:
@@ -213,7 +211,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 20,
+      id: 22,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I20933B00036A9327030_F/dpx6uv/std/360x540/I20933B00036A9327030_F.jpg',
       imageUrlCropped:
@@ -222,7 +220,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 21,
+      id: 23,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H10933B00023V0006529_F/dpx6uv/std/360x540/H10933B00023V0006529_F.jpg',
       imageUrlCropped:
@@ -231,7 +229,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 22,
+      id: 24,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H20939Z70301A9328985_F/dpx6uv/std/360x540/H20939Z70301A9328985_F.jpg',
       imageUrlCropped:
@@ -240,7 +238,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 23,
+      id: 25,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/G20933B70201A9327714_F/dpx6uv/std/360x540/G20933B70201A9327714_F.jpg',
       imageUrlCropped:
@@ -249,7 +247,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 24,
+      id: 26,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U21811A_F/dpx6uv/std/360x540/I209S3G000020U21811A_F',
       imageUrlCropped:
@@ -258,7 +256,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 25,
+      id: 27,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/H29512A0000268352742_F/dpx6uv/std/360x540/H29512A0000268352742_F.jpg',
       imageUrlCropped:
@@ -267,7 +265,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 26,
+      id: 28,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218999_F/dpx6uv/std/360x540/I209S3G000020U218999_F',
       imageUrlCropped:
@@ -276,7 +274,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 27,
+      id: 29,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218749_F/dpx6uv/std/360x540/I209S3G000020U218749_F',
       imageUrlCropped:
@@ -285,7 +283,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 28,
+      id: 30,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U218001_F/dpx6uv/std/360x540/I209S3G000020U218001_F',
       imageUrlCropped:
@@ -294,7 +292,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 29,
+      id: 31,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3G000020U21832G_F/dpx6uv/std/360x540/I209S3G000020U21832G_F',
       imageUrlCropped:
@@ -303,7 +301,7 @@ const App = () => {
       isPdf: false
     },
     {
-      id: 30,
+      id: 32,
       imageUrl:
         'https://moncler-cdn.thron.com/delivery/public/image/moncler/I209S3B00003596J0999_F/dpx6uv/std/360x540/I209S3B00003596J0999_F',
       imageUrlCropped:
@@ -318,17 +316,12 @@ const App = () => {
       try {
         let colors = {};
         let start = new Date();
+        setDone(false);
+        setDominantsColor([]);
         setStart(start);
-        console.log('::::::::::::::::::::::: ');
-        console.log('::::::::::::::::::::::: ');
-        console.log('::::::::::::::::::::::: ');
-        console.log(':::: START :::: ', start);
-        console.log('::::::::::::::::::::::: ');
-        console.log('::::::::::::::::::::::: ');
-        console.log('::::::::::::::::::::::: ');
 
         for (const item of data) {
-          if (!item.isVideo) {
+          if (!item.isVideo && !item.isPdf) {
             const result = await ImageColors.getColors(item.imageUrlCropped, {
               fallback: '#32a852',
               cache: true,
@@ -354,14 +347,6 @@ const App = () => {
 
             let image = { ...item, colors };
 
-            console.log('::::::::::::::::::::::: ');
-            console.log('::::::::::::::::::::::: ');
-            console.log('::::::::::::::::::::::: ');
-            console.log(':::: RESULT :::: ', image);
-            console.log('::::::::::::::::::::::: ');
-            console.log('::::::::::::::::::::::: ');
-            console.log('::::::::::::::::::::::: ');
-
             setDominantsColor(prev => [...prev, image]);
           } else {
             setDominantsColor(prev => [...prev, item]);
@@ -369,15 +354,16 @@ const App = () => {
         }
         let end = new Date();
         setEnd(end);
-        console.log('::::::::::::::::::::::: ');
-        console.log('::::::::::::::::::::::: ');
-        console.log('::::::::::::::::::::::: ');
-        console.log(':::: END :::: ', end);
-        console.log('::::::::::::::::::::::: ');
-        console.log('::::::::::::::::::::::: ');
-        console.log('::::::::::::::::::::::: ');
+        // console.log('::::::::::::::::::::::: ');
+        // console.log('::::::::::::::::::::::: ');
+        // console.log('::::::::::::::::::::::: ');
+        // console.log(':::: END :::: ', dominantsColor);
+        // console.log('::::::::::::::::::::::: ');
+        // console.log('::::::::::::::::::::::: ');
+        // console.log('::::::::::::::::::::::: ');
         let duration = (end - start) / 1000;
         setDuration(duration);
+        setDone(true);
       } catch (error) {
         console.error(error);
       } finally {
@@ -385,23 +371,48 @@ const App = () => {
       }
     };
 
+    setDone(false);
     setDominantsColor([]);
     fetchDominantColor();
   }, []);
 
-  useEffect(() => {
-    const subscription = player.addListener('playingChange', isPlaying => {
-      setIsPlaying(isPlaying);
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [player]);
+  const renderItem = ({ item, index }) => {
+    let kind = item.isVideo ? 'Video' : item.isPdf ? 'Pdf' : 'Image';
+    switch (kind) {
+      case 'Video':
+        console.log('::::::::::::::::::::::: VIDEO ::::: ', kind);
+        console.log('::::::::::::::::::::::: VIDEO ::::: ', item.imageUrl);
+        return (
+          <View key={item.id} style={[styles.viewImage]}>
+            <VideoItem ref={el => (videoRefs.current[index] = el)} videoSource={item.imageUrl} />
+            <Text>{'Video'}</Text>
+          </View>
+        );
+      case 'Pdf':
+        console.log('::::::::::::::::::::::: PDF ::::: ', kind);
+        console.log('::::::::::::::::::::::: PDF ::::: ', item.imageUrl);
+        return (
+          <View key={item.id} style={[styles.viewImage, { backgroundColor: 'blue' }]}>
+            <PdfPreview ref={el => (pdfRefs.current[index] = el)} pdfUrl={item.imageUrl} />
+            {/* <Text>{'PDF'}</Text> */}
+          </View>
+        );
+      case 'Image':
+        console.log('::::::::::::::::::::::: IMAGE ::::: ', kind);
+        console.log('::::::::::::::::::::::: IMAGE ::::: ', item.imageUrl);
+        return (
+          <View key={item.id} style={[styles.viewImage, { backgroundColor: item.colors.background }]}>
+            <Image style={styles.image} source={{ uri: item.imageUrl }} />
+          </View>
+        );
+      default:
+        return <></>;
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {dominantsColor && dominantsColor.length > 0 && (
+      {done && dominantsColor && dominantsColor.length > 0 && (
         <>
           {start && end && (
             <View
@@ -423,40 +434,10 @@ const App = () => {
           )}
           <FlatList
             data={dominantsColor}
-            keyExtractor={(item, index) => {
-              return item.id.toString();
-            }}
+            keyExtractor={(item, i) => i}
             numColumns={2}
-            renderItem={({ item, index }) =>
-              item.isVideo ? (
-                <View key={item.id} style={[styles.viewImage]}>
-                  {/* <VideoView
-                    ref={ref}
-                    style={styles.video}
-                    player={player}
-                    allowsFullscreen
-                    allowsPictureInPicture
-                    contentFit="contain"
-                  /> */}
-                  <Video
-                    ref={videoRef}
-                    style={styles.video}
-                    source={{ uri: videoSource }}
-                    useNativeControls
-                    resizeMode={ResizeMode.CONTAIN}
-                    isLooping
-                    shouldPlay
-                    isMuted
-                  />
-                </View>
-              ) : isPdf ? (
-                <PdfPreview pdfUrl={pdfUrl} />
-              ) : (
-                <View key={item.id} style={[styles.viewImage, { backgroundColor: item.colors.background }]}>
-                  <Image style={styles.image} source={{ uri: item.imageUrl }} />
-                </View>
-              )
-            }
+            initialNumToRender={50}
+            renderItem={renderItem}
           />
         </>
       )}
@@ -491,7 +472,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     flexDirection: 'row',
-    backgroundColor: 'blue',
+    backgroundColor: 'yellow',
     borderColor: 'red',
     borderWidth: 1,
     position: 'relative'
@@ -510,11 +491,6 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0
-  },
-  video: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 0
   }
 });
 
